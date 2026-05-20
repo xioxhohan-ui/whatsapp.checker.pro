@@ -5,12 +5,12 @@ from app.core.config import settings
 
 import os
 
-# Determine if we should use SQLite (default fallback for local development without Postgres)
-use_sqlite = os.environ.get("USE_SQLITE") == "1"
+# Determine if we should use SQLite (default fallback for local development or auto-detected Vercel environment without Postgres)
+is_vercel = os.environ.get("VERCEL") == "1" or os.environ.get("VERCEL_ENV") is not None
+use_sqlite = os.environ.get("USE_SQLITE") == "1" or (is_vercel and not os.environ.get("DATABASE_URL"))
 
 if use_sqlite:
     # Ephemeral serverless containers on Vercel require SQLite database to be placed in the writeable /tmp path
-    is_vercel = os.environ.get("VERCEL") == "1" or os.environ.get("VERCEL_ENV") is not None
     sqlite_path = "/tmp/whatsapp_checker.db" if is_vercel else "./whatsapp_checker.db"
     db_url = f"sqlite+aiosqlite:///{sqlite_path}"
     connect_args = {"check_same_thread": False}
