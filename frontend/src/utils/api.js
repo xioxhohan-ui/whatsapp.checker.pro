@@ -1,9 +1,7 @@
 import axios from 'axios';
 
-const isProduction = import.meta.env.PROD;
-
 const api = axios.create({
-  baseURL: isProduction ? '/_/backend/api/v1' : '/api/v1',
+  baseURL: '/api/v1',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -32,8 +30,7 @@ api.interceptors.response.use(
         const refreshToken = localStorage.getItem('refresh_token');
         if (refreshToken) {
           // Attempt to get a new access token
-          const base = isProduction ? '/_/backend/api/v1' : '/api/v1';
-          const response = await axios.post(`${base}/auth/refresh?refresh_token=${refreshToken}`);
+          const response = await axios.post(`/api/v1/auth/refresh?refresh_token=${refreshToken}`);
           const { access_token, refresh_token } = response.data;
           
           localStorage.setItem('access_token', access_token);

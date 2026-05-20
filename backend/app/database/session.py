@@ -48,8 +48,48 @@ class Base(DeclarativeBase):
     pass
 
 
+_db_initialized = False
+
+async def ensure_db_initialized():
+    global _db_initialized
+    if _db_initialized:
+        return
+    
+    # Run migrations / create tables
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+        
+    # Seed default admin user
+    from app.models.database import User
+    from app.core.security import hash_password
+    from sqlalchemy import select
+    
+    async with SessionLocal() as session:
+        try:
+            stmt = select(User).where(User.email == settings.ADMIN_EMAIL)
+            result = await session.execute(stmt)
+            admin_user = result.scalar_one_or_none()
+            
+            if not admin_user:
+                hashed_pw = hash_password(settings.ADMIN_PASSWORD)
+                new_admin = User(
+                    email=settings.ADMIN_EMAIL,
+                    password_hash=hashed_pw,
+                    role="admin",
+                    is_active=True
+                )
+                session.add(new_admin)
+                await session.commit()
+            _db_initialized = True
+        except Exception:
+            await session.rollback()
+            # Mark initialized so we don't spam attempts on lock/concurrency
+            _db_initialized = True
+
+
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """Dependency generator for database sessions in routes."""
+    await ensure_db_initialized()
     async with SessionLocal() as session:
         try:
             yield session
