@@ -84,12 +84,17 @@ export const useCheckerStore = create((set, get) => ({
     // Disconnect old socket
     get().disconnectWebSocket();
 
+    const isProduction = import.meta.env.PROD;
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const host = window.location.host;
-    // In dev: proxy works for HTTP, but for WS we point directly to backend if needed, or via matching host
-    // Let's use standard host with dev fallback: if host is localhost:3000, WS goes to localhost:8000
-    const wsHost = host.includes('localhost:3000') ? 'localhost:8000' : host;
-    const wsUrl = `${protocol}//${wsHost}/api/v1/ws/${jobId}`;
+
+    let wsUrl;
+    if (isProduction) {
+      wsUrl = `${protocol}//${host}/_/backend/api/v1/ws/${jobId}`;
+    } else {
+      const wsHost = host.includes('localhost:3000') ? 'localhost:8000' : host;
+      wsUrl = `${protocol}//${wsHost}/api/v1/ws/${jobId}`;
+    }
 
     logger_log(`Connecting to WS: ${wsUrl}`);
     const socket = new WebSocket(wsUrl);
