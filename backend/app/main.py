@@ -72,8 +72,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routes
+# Include routes with fallback prefixes to ensure 100% compatibility with all serverless URL forwarding variations
 app.include_router(api_router, prefix=settings.API_V1_STR)
+app.include_router(api_router, prefix="/v1")
+app.include_router(api_router, prefix="")
 
 
 # ==========================================
@@ -81,6 +83,8 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 # ==========================================
 
 @app.websocket("/api/v1/ws/{job_id}")
+@app.websocket("/v1/ws/{job_id}")
+@app.websocket("/ws/{job_id}")
 async def websocket_endpoint(websocket: WebSocket, job_id: str):
     """WebSocket connection route for streaming checking logs and job statistics."""
     await manager.connect(websocket, job_id)
