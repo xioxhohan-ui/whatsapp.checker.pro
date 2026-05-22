@@ -17,9 +17,9 @@ import {
 export default function LandingPage() {
   const navigate = useNavigate();
 
-  // Initialize theme from localStorage or default to light
+  // Initialize theme from localStorage or default to dark
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('theme') || 'light';
+    return localStorage.getItem('theme') || 'dark';
   });
 
   useEffect(() => {

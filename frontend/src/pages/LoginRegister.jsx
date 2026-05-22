@@ -18,7 +18,7 @@ export default function LoginRegister() {
 
   // Theme support
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('theme') || 'light';
+    return localStorage.getItem('theme') || 'dark';
   });
 
   useEffect(() => {
