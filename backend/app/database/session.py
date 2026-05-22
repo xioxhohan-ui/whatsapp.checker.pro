@@ -7,7 +7,8 @@ import os
 
 # Determine if we should use SQLite (default fallback for local development or auto-detected Vercel environment without Postgres)
 is_vercel = os.environ.get("VERCEL") == "1" or os.environ.get("VERCEL_ENV") is not None
-use_sqlite = os.environ.get("USE_SQLITE") == "1" or (is_vercel and not os.environ.get("DATABASE_URL"))
+use_sqlite_val = os.environ.get("USE_SQLITE") or settings.USE_SQLITE
+use_sqlite = use_sqlite_val == "1" or str(use_sqlite_val).lower() == "true" or (is_vercel and not os.environ.get("DATABASE_URL"))
 
 if use_sqlite:
     # Ephemeral serverless containers on Vercel require SQLite database to be placed in the writeable /tmp path

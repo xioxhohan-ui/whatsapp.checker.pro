@@ -127,15 +127,21 @@ async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
                         db_user = res.scalar_one_or_none()
                         
                         if not db_user:
-                            db_user = User(
-                                id=user_id,
-                                email=user_in.email,
-                                role=role,
-                                is_active=True
-                            )
-                            db.add(db_user)
-                            await db.commit()
-                            await db.refresh(db_user)
+                            try:
+                                db_user = User(
+                                    id=user_id,
+                                    email=user_in.email,
+                                    role=role,
+                                    is_active=True
+                                )
+                                db.add(db_user)
+                                await db.commit()
+                                await db.refresh(db_user)
+                            except Exception:
+                                await db.rollback()
+                                stmt = select(User).where(User.id == user_id)
+                                res = await db.execute(stmt)
+                                db_user = res.scalar_one()
                         return db_user
                     else:
                         raise HTTPException(status_code=400, detail="Failed to retrieve user ID from auth gateway")
@@ -199,17 +205,23 @@ async def login(user_in: UserLogin, db: AsyncSession = Depends(get_db)):
                     user = res.scalar_one_or_none()
                     
                     if not user:
-                        role = "user"
-                        if user_in.email == settings.ADMIN_EMAIL:
-                            role = "admin"
-                        user = User(
-                            id=user_id,
-                            email=user_in.email,
-                            role=role,
-                            is_active=True
-                        )
-                        db.add(user)
-                        await db.commit()
+                        try:
+                            role = "user"
+                            if user_in.email == settings.ADMIN_EMAIL:
+                                role = "admin"
+                            user = User(
+                                id=user_id,
+                                email=user_in.email,
+                                role=role,
+                                is_active=True
+                            )
+                            db.add(user)
+                            await db.commit()
+                        except Exception:
+                            await db.rollback()
+                            stmt = select(User).where(User.id == user_id)
+                            res = await db.execute(stmt)
+                            user = res.scalar_one()
                     elif not user.is_active:
                         raise HTTPException(status_code=400, detail="Account is blocked")
                         

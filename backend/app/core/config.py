@@ -56,6 +56,9 @@ class Settings(BaseSettings):
     TELEGRAM_BOT_TOKEN: str | None = None
     TELEGRAM_CHAT_ID: str | None = None
 
+    # Database Fallback
+    USE_SQLITE: str = "0"
+
     # Supabase Settings
     SUPABASE_URL: str = ""
     SUPABASE_ANON_KEY: str = ""
