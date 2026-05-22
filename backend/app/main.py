@@ -40,6 +40,7 @@ async def lifespan(app: FastAPI):
                 logger.info(f"Seeding default admin user: {settings.ADMIN_EMAIL}")
                 hashed_pw = hash_password(settings.ADMIN_PASSWORD)
                 new_admin = User(
+                    id="usr_admin",
                     email=settings.ADMIN_EMAIL,
                     password_hash=hashed_pw,
                     role="admin",

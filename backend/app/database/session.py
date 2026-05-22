@@ -73,6 +73,7 @@ async def ensure_db_initialized():
             if not admin_user:
                 hashed_pw = hash_password(settings.ADMIN_PASSWORD)
                 new_admin = User(
+                    id="usr_admin",
                     email=settings.ADMIN_EMAIL,
                     password_hash=hashed_pw,
                     role="admin",
