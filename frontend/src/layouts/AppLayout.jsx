@@ -23,9 +23,9 @@ export default function AppLayout({ children }) {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Initialize theme from localStorage or default to dark
+  // Initialize theme from localStorage or default to light
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('theme') || 'dark';
+    return localStorage.getItem('theme') || 'light';
   });
 
   useEffect(() => {

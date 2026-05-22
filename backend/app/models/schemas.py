@@ -21,11 +21,12 @@ class UserUpdate(BaseModel):
 
 
 class UserResponse(BaseModel):
-    id: int
+    id: str
     email: EmailStr
     role: str
     is_active: bool
     telegram_chat_id: Optional[str] = None
+    avatar_url: Optional[str] = None
     created_at: datetime
 
     class Config:
@@ -45,7 +46,7 @@ class TokenData(BaseModel):
 # Job Schemas
 class JobResponse(BaseModel):
     id: str
-    user_id: int
+    user_id: str
     status: str
     total_numbers: int
     valid_count: int
@@ -125,7 +126,7 @@ class ApiKeyCreate(BaseModel):
 
 class ApiKeyResponse(BaseModel):
     id: str
-    user_id: int
+    user_id: str
     provider: str
     name: str
     credentials: Dict[str, Any]

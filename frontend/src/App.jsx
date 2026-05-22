@@ -78,7 +78,7 @@ export default function App() {
   // Apply persisted theme on initial load
   useEffect(() => {
     checkAuth();
-    const savedTheme = localStorage.getItem('theme') || 'dark';
+    const savedTheme = localStorage.getItem('theme') || 'light';
     const root = document.documentElement;
     const body = document.body;
     if (savedTheme === 'dark') {
